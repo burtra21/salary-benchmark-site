@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Get Your Salary Benchmark Report</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            color: #2A3F54;
+            margin-top: 0;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input[type="text"],
+        input[type="email"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        button {
+            background-color: #2A3F54;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #1f2f3d;
+        }
+        .hidden {
+            display: none;
+        }
+        #loading {
+            text-align: center;
+            margin-top: 20px;
+        }
+        #error-message {
+            color: #d9534f;
+            margin-top: 20px;
+            padding: 10px;
+            border: 1px solid #d9534f;
+            border-radius: 4px;
+            background-color: #f9f2f2;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container" id="form-container">
+        <h1>Step 2: Tell us about yourself</h1>
+        <form id="benchmarkForm">
+            <!-- Hidden fields for data from previous page -->
+            <input type="hidden" id="industry" name="industry" value="">
+            <input type="hidden" id="jobCategory" name="jobCategory" value="">
+            <input type="hidden" id="location" name="location" value="">
+            
+            <div class="form-group">
+                <label for="jobTitle">Your Job Title</label>
+                <input type="text" id="jobTitle" name="jobTitle" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="name">Name</label>
+                <input type="text" id="name" name="name" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" name="email" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="company">Company</label>
+                <input type="text" id="company" name="company" required>
+            </div>
+            
+            <button type="submit">Get My Benchmark Report</button>
+        </form>
+        
+        <div id="error-message"></div>
+        <div id="loading" class="hidden">Generating your report... This may take a few moments.</div>
+    </div>
+
+    <div id="report-container" class="hidden"></div>
+
+    <script>
+        // Parse URL parameters
+        function getUrlParams() {
+            const params = {};
+            const queryString = window.location.search;
+            const urlParams = new URLSearchParams(queryString);
+            
+            for (const [key, value] of urlParams) {
+                params[key] = value;
+            }
+            
+            return params;
+        }
+        
+        // Set hidden form fields from URL parameters
+        const params = getUrlParams();
+        document.getElementById('industry').value = params.industry || '';
+        document.getElementById('jobCategory').value = params.jobCategory || '';
+        document.getElementById('location').value = params.location || '';
+        
+        // For debugging - log the parameters
+        console.log('Parameters received:', params);
+        
+        // Form submission handler
+        document.getElementById('benchmarkForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            // Show loading indicator
+            document.getElementById('loading').classList.remove('hidden');
+            document.getElementById('error-message').style.display = 'none';
+            
+            // Get form data
+            const formData = new FormData(this);
+            const jsonData = {};
+            
+            for (const [key, value] of formData.entries()) {
+                jsonData[key] = value;
+            }
+            
+            console.log('Submitting form data:', jsonData);
+            
+            try {
+                // Use the Netlify function instead of directly calling n8n
+                const response = await fetch('/.netlify/functions/forward-to-n8n', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(jsonData)
+                });
+                
+                console.log('Response received:', response.status);
+                
+                // Get response text
+                const responseText = await response.text();
+                
+                // Try to parse as JSON first to check for errors
+                let responseData;
+                try {
+                    responseData = JSON.parse(responseText);
+                    
+                    // If we got JSON with an error message, display it
+                    if (responseData.message) {
+                        throw new Error(responseData.message);
+                    }
+                } catch (jsonError) {
+                    // Not JSON, assume it's HTML
+                    console.log('Received HTML response');
+                }
+                
+                // Hide the form and show the report
+                document.getElementById('form-container').classList.add('hidden');
+                const reportContainer = document.getElementById('report-container');
+                reportContainer.innerHTML = responseText;
+                reportContainer.classList.remove('hidden');
+                
+            } catch (error) {
+                console.error('Error submitting form:', error);
+                document.getElementById('error-message').textContent = 'There was an error generating your report: ' + error.message;
+                document.getElementById('error-message').style.display = 'block';
+                document.getElementById('loading').classList.add('hidden');
+            }
+        });
+    </script>
+</body>
+</html>

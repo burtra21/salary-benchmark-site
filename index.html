@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Salary Benchmark Report</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            color: #2A3F54;
+            margin-top: 0;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background-color: white;
+        }
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        button {
+            background-color: #2A3F54;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            float: right;
+        }
+        button:hover {
+            background-color: #1f2f3d;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Salary Benchmark Report</h1>
+        <form id="stepOneForm">
+            <div class="form-group">
+                <label for="industry">Industry</label>
+                <select id="industry" name="industry" required>
+                    <option value="">— Select —</option>
+                    <option value="Maritime/Shipbuilding">Maritime/Shipbuilding</option>
+                    <option value="Oil & Gas">Oil & Gas</option>
+                    <!-- Add more options as needed -->
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="jobCategory">Job Category</label>
+                <select id="jobCategory" name="jobCategory" required>
+                    <option value="">— Select —</option>
+                    <option value="Engineer">Engineer</option>
+                    <option value="Field Service">Field Service</option>
+                    <!-- Add more options as needed -->
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="location">Location (optional)</label>
+                <input type="text" id="location" name="location">
+            </div>
+            
+            <button type="submit">Next →</button>
+        </form>
+    </div>
+
+    <script>
+        document.getElementById('stepOneForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Get form values
+            const industry = document.getElementById('industry').value;
+            const jobCategory = document.getElementById('jobCategory').value;
+            const location = document.getElementById('location').value;
+            
+            // Build URL with parameters
+            const url = `thank-you.html?industry=${encodeURIComponent(industry)}&jobCategory=${encodeURIComponent(jobCategory)}&location=${encodeURIComponent(location)}`;
+            
+            // Redirect to thank you page
+            window.location.href = url;
+        });
+    </script>
+</body>
+</html>
