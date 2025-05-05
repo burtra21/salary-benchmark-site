@@ -12,7 +12,7 @@ exports.handler = async function(event, context) {
     console.log('Form data received from Netlify submission:', JSON.stringify(formData, null, 2));
 
     // Forward the data to n8n
-    const webhookUrl = 'https://getezpz.app.n8n.cloud/webhook/webhook/salary-benchmark';
+    const webhookUrl = 'https://getezpz.app.n8n.cloud/webhook/salary-benchmark';
     console.log('Calling n8n webhook URL:', webhookUrl);
 
     // Use the parsed form data directly
